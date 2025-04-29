@@ -66,24 +66,6 @@ Welcome! 👋 This is the Document Intelligence Suite, your one-stop solution fo
   ```bash
   curl http://localhost:8000/export?format=csv -o data.csv
   ```
-
----
-
-## 📐 Architecture Overview
-
-```mermaid
-flowchart LR
-  A[Upload Endpoint] --> B{File Type?}
-  B -->|Scanned| C[OCR (Tesseract/PaddleOCR)]
-  B -->|Text-PDF| D[PDF Parser (pdfplumber/PyMuPDF)]
-  C & D --> E[Semantic Chunking + Embeddings]
-  E --> F[FAISS Vector Store]
-  F --> G[Q&A Chat (LLM/OpenAI)]
-  F --> H[Data Extraction (spaCy/Regex)]
-  H --> I[Output (JSON/CSV/Callback)]
-  G & I --> J[React Dashboard]
-```
-
 ---
 
 ## 🤝 Contributing
