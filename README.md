@@ -20,28 +20,51 @@ Welcome! 👋 This is the Document Intelligence Suite, your one-stop solution fo
 
 ## 🛠️ Installation & Setup
 
-1. **Clone the repo**
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Steps
+
+1. **Clone the Repository**
 
    ```bash
-   git clone https://github.com/your-username/document-intel-suite.git
-   cd document-intel-suite
+   git clone https://github.com/your-username/IDIS.git
+   cd IDIS
    ```
 
 2. **Environment Variables**
 
-   - Copy `.env.example` to `.env`
+   - Copy `.env.example` to `.env` in the `backend` folder.
    - Fill in your OpenAI API key (if using) and any other secrets.
 
-3. **Local Development with Docker**
+3. **Build and Start Services**
+
+   Use Docker Compose to build and run both the backend and frontend services.
 
    ```bash
    docker-compose up --build
    ```
 
-4. **Access the App**
+4. **Access the Application**
 
-   - FastAPI docs: `http://localhost:8000/docs`
-   - Dashboard: `http://localhost:3000`
+   - Backend API: [http://localhost:8000/docs](http://localhost:8000/docs)
+   - Frontend Dashboard: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 📦 Docker Setup
+
+The project uses Docker to containerize both the backend and frontend services.
+
+### Backend Dockerfile
+
+The backend Dockerfile is located at `/IDIS/backend/Dockerfile` and includes dependencies for FastAPI, Tesseract OCR, and other tools.
+
+### Frontend Dockerfile
+
+The frontend Dockerfile is located at `/IDIS/frontend/Dockerfile` and is configured to build and serve the React application using a lightweight Node.js image.
 
 ---
 
@@ -66,6 +89,7 @@ Welcome! 👋 This is the Document Intelligence Suite, your one-stop solution fo
   ```bash
   curl http://localhost:8000/export?format=csv -o data.csv
   ```
+
 ---
 
 ## 🤝 Contributing
@@ -80,5 +104,4 @@ This project is licensed under the MIT License. See [LICENSE](LICENSE) for detai
 
 ---
 
-*Last updated: April 29, 2025*
-
+*Last updated: April 30, 2025*

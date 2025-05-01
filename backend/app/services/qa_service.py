@@ -15,16 +15,13 @@ settings = get_settings()
 
 class QAService:
     """Service for document querying and question answering"""
-    
-    def __init__(self):
+
+    def __init__(self, provider: Optional[str] = None):
         """Initialize QA service with required components"""
         self.embedding_generator = EmbeddingGenerator()
-        self.llm = LLMOrchestrator()
-    
-    async def answer_query(self, 
-                          query: str, 
-                          document_ids: List[str],
-                          k: int = 5) -> QueryResponse:
+        self.llm = LLMOrchestrator(provider=provider)
+
+    async def answer_query(self, query: str, document_ids: List[str], k: int = 5) -> QueryResponse:
         """
         Answer a query using the specified documents
         
@@ -38,67 +35,32 @@ class QAService:
         """
         if not query:
             raise ValueError("Query cannot be empty")
-            
         if not document_ids:
             raise ValueError("At least one document ID is required")
-            
-        # Generate query embedding
+
         query_embedding = self.embedding_generator.generate_embeddings([query])[0]
-        
-        # Search each document's vector store
         all_contexts = []
-        
+
         for doc_id in document_ids:
             try:
-                # Load vector store for document
                 vector_store = VectorStore(doc_id)
-                
-                # Search for relevant chunks
-                contexts, distances = vector_store.search(
-                    query_vector=query_embedding,
-                    k=k
-                )
-                
-                # Add to combined contexts
+                contexts, _ = vector_store.search(query_vector=query_embedding, k=k)
                 all_contexts.extend(contexts)
-                
             except Exception as e:
                 logger.error(f"Error searching document {doc_id}: {e}")
-                # Continue with other documents
-        
+
         if not all_contexts:
             return QueryResponse(
                 query=query,
                 answer="I couldn't find any relevant information in the specified documents.",
                 sources=[]
             )
-        
-        # Sort all contexts by relevance (if we had distances for all)
-        # This would require keeping track of distances alongside contexts
-        
-        # Generate answer using LLM
-        result = await self.llm.generate_answer(
-            query=query,
-            context_docs=all_contexts
-        )
-        
-        # Format sources for response
-        sources = []
-        for ctx in all_contexts:
-            meta = ctx.get("metadata", {})
-            if meta:
-                source = {
-                    "document_id": meta.get("document_id", "unknown"),
-                    "source": meta.get("source", "unknown"),
-                    "page": meta.get("page_num", None)
-                }
-                if source not in sources:
-                    sources.append(source)
-        
+
+        result = await self.llm.generate_answer(query=query, context_docs=all_contexts)
         return QueryResponse(
             query=query,
             answer=result["answer"],
-            sources=sources
+            sources=result["sources"]
         )
     
     async def chat_with_document(self,

@@ -3,6 +3,8 @@ from functools import lru_cache
 from typing import Optional, Literal
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
 
 class Settings(BaseSettings):
     """Application settings"""
@@ -24,11 +26,14 @@ class Settings(BaseSettings):
     vector_dimension: int = 384
     
     # LLM settings
-    llm_provider: Literal["openai", "ollama", "huggingface"] = "openai"
-    openai_api_key: Optional[str] = None
+    llm_provider: Literal["openai", "groq", "ollama", "huggingface"] = "groq"
     ollama_url: str = "http://localhost:11434"
     ollama_model: str = "mistral"
-    
+    groq_api_key: Optional[str] = os.getenv("GROQ_API_KEY")
+    groq_model: str = "llama3-8b-8192"  # Updated to a model that should be available
+    openai_api_key: Optional[str] = os.getenv("OPENAI_API_KEY")
+    openai_model: str = "gpt-4"
+
     # Security
     api_key: Optional[str] = None
     

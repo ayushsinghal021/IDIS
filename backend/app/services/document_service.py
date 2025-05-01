@@ -5,6 +5,9 @@ import json
 import asyncio
 from pathlib import Path
 import uuid
+from datetime import date
+import numpy as np
+from fastapi import HTTPException
 
 from app.config import get_settings
 from app.models.document import DocumentResponse, ProcessingStatus
@@ -34,11 +37,11 @@ class DocumentService:
         Path(settings.upload_folder).mkdir(parents=True, exist_ok=True)
         Path(settings.processed_folder).mkdir(parents=True, exist_ok=True)
         Path(settings.vector_folder).mkdir(parents=True, exist_ok=True)
-    
+
     async def process_document(self, 
-                              file_path: str, 
-                              document_id: str,
-                              original_filename: Optional[str] = None) -> Dict[str, Any]:
+                            file_path: str, 
+                            document_id: str,
+                            original_filename: Optional[str] = None) -> Dict[str, Any]:
         """
         Process a document through the full pipeline
         
@@ -85,7 +88,6 @@ class DocumentService:
                 
                 # If PDF is scanned, perform OCR
                 if ext == '.pdf' and parsed_doc.get("is_scanned", False):
-                    # This would extract images from PDF and process them
                     logger.info(f"Document {document_id} appears to be scanned, performing OCR")
                     # Implementation depends on how you're extracting PDF images
             
@@ -107,7 +109,7 @@ class DocumentService:
             
             # Step 5: Store in vector database
             vector_store = VectorStore(document_id)
-            vectors = [chunk["embedding"] for chunk in chunks_with_embeddings]
+            vectors = np.array([chunk["embedding"] for chunk in chunks_with_embeddings], dtype=np.float32)  # Convert to NumPy array
             metadata_list = [
                 {
                     "text": chunk["text"],
@@ -150,7 +152,7 @@ class DocumentService:
                 message=f"Processing failed: {str(e)}"
             )
             raise
-    
+
     async def get_document_status(self, document_id: str) -> Optional[DocumentResponse]:
         """Get document processing status"""
         status_path = Path(settings.processed_folder) / f"{document_id}_status.json"

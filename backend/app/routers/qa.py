@@ -16,7 +16,6 @@ async def query_documents(
     settings: Settings = Depends(get_settings)
 ):
     """Query documents and get answers"""
-    
     try:
         qa_service = QAService()
         response = await qa_service.answer_query(
@@ -26,6 +25,7 @@ async def query_documents(
         )
         return response
     except ValueError as e:
+        logger.error(f"Validation error: {e}")
         raise HTTPException(status_code=400, detail=str(e))
     except Exception as e:
         logger.error(f"Error processing query: {e}")
