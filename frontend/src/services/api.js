@@ -27,10 +27,10 @@ export const uploadFile = async (file) => {
 
 // Perform Q&A
 export const askQuestion = async (question) => {
-  const response = await fetch(`${BASE_URL}/chat`, {
+  const response = await fetch(`${BASE_URL}/api/qa/query`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ question }),
+    body: JSON.stringify({ query: question, document_ids: [] }),
   });
 
   if (!response.ok) {
@@ -41,8 +41,11 @@ export const askQuestion = async (question) => {
 };
 
 // Export data
-export const exportData = async (format) => {
-  const response = await fetch(`${BASE_URL}/export?format=${format}`);
+export const exportData = async (format, documentId) => {
+  if (!documentId) {
+    throw new Error('Document ID is required for export');
+  }
+  const response = await fetch(`${BASE_URL}/api/export/${format}/${documentId}`);
 
   if (!response.ok) {
     throw new Error('Failed to export data');
